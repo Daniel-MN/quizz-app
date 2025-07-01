@@ -60,6 +60,7 @@
     <div id="answers"></div>
     <p id="feedback"></p>
     <p>Correct: <span id="correctCount">0</span> | Wrong: <span id="wrongCount">0</span></p>
+    <button onclick="goBack()">Back to Chapters</button>
   </div>
 </div>
 
@@ -89,7 +90,7 @@ function selectChapter(chapter) {
 
 function showQuestion() {
   if (currentQuestion >= questions.length) {
-    document.getElementById('quiz').innerHTML = `<h2>Quiz Finished!</h2><p>Correct: ${correctCount} | Wrong: ${wrongCount}</p><button onclick="location.reload()">Restart</button>`;
+    document.getElementById('quiz').innerHTML = `<h2>Quiz Finished!</h2><p>Correct: ${correctCount} | Wrong: ${wrongCount}</p><button onclick="location.reload()">Restart</button><button onclick="goBack()">Back to Chapters</button>`;
     return;
   }
   const q = questions[currentQuestion];
@@ -119,6 +120,11 @@ function checkAnswer(selected) {
   document.getElementById('wrongCount').textContent = wrongCount;
   currentQuestion++;
   setTimeout(showQuestion, 1000);
+}
+
+function goBack() {
+  document.getElementById('quiz').style.display = 'none';
+  document.getElementById('chapter-selection').style.display = 'block';
 }
 </script>
 </body>
