@@ -75,7 +75,7 @@ function parseLine(line) {
 }
 
 function selectChapter(chapter) {
-  fetch(`chapter${chapter}.csv`)
+  fetch(`chapter${chapter}.csv?nocache=${Date.now()}`)
     .then(response => response.text())
     .then(text => {
       questions = text.trim().split('\n').map(parseLine);
