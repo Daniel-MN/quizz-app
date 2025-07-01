@@ -73,7 +73,9 @@ if (performance.navigation.type === 1) {
     <div id="answers"></div>
     <p id="feedback"></p>
     <p>Correct: <span id="correctCount">0</span> | Wrong: <span id="wrongCount">0</span></p>
-    <button onclick="goBack()">Back to Chapters</button>
+    <button id="nextBtn" style="display:none" onclick="nextQuestion()">Next Question</button>
+    <br><br>
+    <button style="background:#f44336;" onclick="goBack()">Back to Chapters</button>
   </div>
 </div>
 
@@ -82,6 +84,7 @@ let questions = [];
 let currentQuestion = 0;
 let correctCount = 0;
 let wrongCount = 0;
+let answered = false;
 
 function parseLine(line) {
   return line.split(';').map(e => e.trim());
@@ -103,7 +106,7 @@ function selectChapter(chapter) {
 
 function showQuestion() {
   if (currentQuestion >= questions.length) {
-    document.getElementById('quiz').innerHTML = `<h2>Quiz Finished!</h2><p>Correct: ${correctCount} | Wrong: ${wrongCount}</p><button onclick="location.reload()">Restart</button><button onclick="goBack()">Back to Chapters</button>`;
+    document.getElementById('quiz').innerHTML = `<h2>Quiz Finished!</h2><p>Correct: ${correctCount} | Wrong: ${wrongCount}</p><button onclick="location.reload()">Restart</button><br><br><button style='background:#f44336;' onclick="goBack()">Back to Chapters</button>`;
     return;
   }
   const q = questions[currentQuestion];
@@ -114,25 +117,35 @@ function showQuestion() {
     const btn = document.createElement('button');
     btn.textContent = `${option}: ${q[index + 1]}`;
     btn.className = 'answer';
-    btn.onclick = () => checkAnswer(option);
+    btn.onclick = () => checkAnswer(option, btn);
     answersDiv.appendChild(btn);
   });
   document.getElementById('feedback').textContent = '';
+  document.getElementById('nextBtn').style.display = 'none';
+  answered = false;
 }
 
-function checkAnswer(selected) {
+function checkAnswer(selected, btn) {
+  if (answered) return;
+  answered = true;
   const correct = questions[currentQuestion][4].trim();
   if (selected === correct) {
     correctCount++;
     document.getElementById('feedback').textContent = 'Correct!';
+    btn.classList.add('correct');
   } else {
     wrongCount++;
     document.getElementById('feedback').textContent = `Wrong! Correct answer: ${correct}`;
+    btn.classList.add('wrong');
   }
   document.getElementById('correctCount').textContent = correctCount;
   document.getElementById('wrongCount').textContent = wrongCount;
+  document.getElementById('nextBtn').style.display = 'inline-block';
+}
+
+function nextQuestion() {
   currentQuestion++;
-  setTimeout(showQuestion, 1000);
+  showQuestion();
 }
 
 function goBack() {
