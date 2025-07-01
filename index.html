@@ -83,6 +83,7 @@ if (performance.navigation.type === 1) {
     <p id="feedback"></p>
     <p>Correct: <span id="correctCount">0</span> | Wrong: <span id="wrongCount">0</span></p>
     <button id="nextBtn" style="display:none" onclick="nextQuestion()">Next Question</button>
+    <button id="nextPageBtn" style="display:none" onclick="nextPage()">Next Page</button>
     <br><br>
     <button style="background:#f44336;" onclick="goBack()">Back to Chapters</button>
   </div>
@@ -132,6 +133,7 @@ function showQuestion() {
   });
   document.getElementById('feedback').textContent = '';
   document.getElementById('nextBtn').style.display = 'none';
+  document.getElementById('nextPageBtn').style.display = 'none';
   answered = false;
 }
 
@@ -151,10 +153,16 @@ function checkAnswer(selected, btn) {
   document.getElementById('correctCount').textContent = correctCount;
   document.getElementById('wrongCount').textContent = wrongCount;
   document.getElementById('nextBtn').style.display = 'inline-block';
+  document.getElementById('nextPageBtn').style.display = 'inline-block';
 }
 
 function nextQuestion() {
   currentQuestion++;
+  showQuestion();
+}
+
+function nextPage() {
+  currentQuestion = Math.min(currentQuestion - (currentQuestion % 10) + 10, questions.length);
   showQuestion();
 }
 
