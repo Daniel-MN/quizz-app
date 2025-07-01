@@ -69,11 +69,15 @@ let currentQuestion = 0;
 let correctCount = 0;
 let wrongCount = 0;
 
+function parseLine(line) {
+  return line.split(';').map(e => e.trim());
+}
+
 function selectChapter(chapter) {
   fetch(`chapter${chapter}.csv`)
     .then(response => response.text())
     .then(text => {
-      questions = text.trim().split('\n').map(line => line.split(','));
+      questions = text.trim().split('\n').map(parseLine);
       currentQuestion = 0;
       correctCount = 0;
       wrongCount = 0;
