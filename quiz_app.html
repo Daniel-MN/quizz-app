@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quick Quiz App</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #6e8efb, #a777e3);
+    color: #fff;
+    text-align: center;
+    padding: 2rem;
+  }
+  .container {
+    background: #fff;
+    color: #333;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+  button {
+    padding: 0.7rem 1.5rem;
+    margin: 0.5rem;
+    border: none;
+    border-radius: 5px;
+    background: #6e8efb;
+    color: #fff;
+    cursor: pointer;
+  }
+  button:hover {
+    background: #a777e3;
+  }
+  .answer {
+    display: block;
+    margin: 1rem 0;
+    padding: 0.7rem;
+    background: #eee;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .correct { background-color: #8bc34a; }
+  .wrong { background-color: #f44336; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Quick Quiz</h1>
+  <div id="chapter-selection">
+    <h2>Select Chapter</h2>
+    <button onclick="selectChapter(1)">Chapter 1</button>
+    <button onclick="selectChapter(2)">Chapter 2</button>
+    <button onclick="selectChapter(3)">Chapter 3</button>
+  </div>
+  
+  <div id="quiz" style="display:none">
+    <h2 id="question"></h2>
+    <div id="answers"></div>
+    <p id="feedback"></p>
+    <p>Correct: <span id="correctCount">0</span> | Wrong: <span id="wrongCount">0</span></p>
+  </div>
+</div>
+
+<script>
+let questions = [];
+let currentQuestion = 0;
+let correctCount = 0;
+let wrongCount = 0;
+
+function selectChapter(chapter) {
+  fetch(`chapter${chapter}.csv`)
+    .then(response => response.text())
+    .then(text => {
+      questions = text.trim().split('\n').map(line => line.split(','));
+      currentQuestion = 0;
+      correctCount = 0;
+      wrongCount = 0;
+      document.getElementById('chapter-selection').style.display = 'none';
+      document.getElementById('quiz').style.display = 'block';
+      showQuestion();
+    });
+}
+
+function showQuestion() {
+  if (currentQuestion >= questions.length) {
+    document.getElementById('quiz').innerHTML = `<h2>Quiz Finished!</h2><p>Correct: ${correctCount} | Wrong: ${wrongCount}</p><button onclick="location.reload()">Restart</button>`;
+    return;
+  }
+  const q = questions[currentQuestion];
+  document.getElementById('question').textContent = q[0];
+  const answersDiv = document.getElementById('answers');
+  answersDiv.innerHTML = '';
+  ['A', 'B', 'C'].forEach((option, index) => {
+    const btn = document.createElement('button');
+    btn.textContent = `${option}: ${q[index + 1]}`;
+    btn.className = 'answer';
+    btn.onclick = () => checkAnswer(option);
+    answersDiv.appendChild(btn);
+  });
+  document.getElementById('feedback').textContent = '';
+}
+
+function checkAnswer(selected) {
+  const correct = questions[currentQuestion][4].trim();
+  if (selected === correct) {
+    correctCount++;
+    document.getElementById('feedback').textContent = 'Correct!';
+  } else {
+    wrongCount++;
+    document.getElementById('feedback').textContent = `Wrong! Correct answer: ${correct}`;
+  }
+  document.getElementById('correctCount').textContent = correctCount;
+  document.getElementById('wrongCount').textContent = wrongCount;
+  currentQuestion++;
+  setTimeout(showQuestion, 1000);
+}
+</script>
+</body>
+</html>
