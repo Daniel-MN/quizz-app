@@ -32,6 +32,13 @@
     font-size: 0.9rem;
     color: #666;
   }
+  .button-group {
+    margin-bottom: 1rem;
+  }
+  .button-separator {
+    margin: 1.5rem 0;
+    border-top: 1px solid #ccc;
+  }
   button {
     padding: 0.7rem 1.5rem;
     margin: 0.3rem;
@@ -73,9 +80,13 @@ if (performance.navigation.type === 1) {
   <h1 id="mainTitle">Examen licență ca la școala de șoferi</h1>
   <div id="chapter-selection">
     <h2>Alege materia</h2>
-    <button onclick="selectChapter(1)">Kinesiologie - 290 întrebări</button>
-    <button onclick="selectChapter(2)">KDFS - 310 întrebări</button>
-    <button onclick="selectChapter(3)">BGK - 150 întrebări</button>
+    <div class="button-group">
+      <button onclick="selectChapter(1)">Kinesiologie - 290 întrebări</button>
+      <button onclick="selectChapter(2)">KDFS - 310 întrebări</button>
+      <button onclick="selectChapter(3)">BGK - 150 întrebări</button>
+    </div>
+    <div class="button-separator"></div>
+    <button onclick="startExam()">Încearcă un examen</button>
   </div>
   
   <div id="quiz" style="display:none;">
@@ -85,7 +96,7 @@ if (performance.navigation.type === 1) {
       </div>
       <div class="question-counter" id="questionCounter"></div>
       <div>
-        <button id="nextPageBtn" style="display:none; background:#f44336;" onclick="nextPage()">Sari la următoarea pagină</button>
+        <button id="nextPageBtn" style="display:none; background:#f44336;" onclick="nextPage()">Sari la prima întrebare de pe următoarea pagină</button>
       </div>
     </div>
     <h2 id="question"></h2>
@@ -98,17 +109,20 @@ if (performance.navigation.type === 1) {
 
 <script>
 let questions = [];
+let allQuestions = { 1: [], 2: [], 3: [] };
 let currentQuestion = 0;
 let correctCount = 0;
 let wrongCount = 0;
 let answered = false;
 let chapterName = "";
+let examMode = false;
 
 function parseLine(line) {
   return line.split(';').map(e => e.trim());
 }
 
 function selectChapter(chapter) {
+  examMode = false;
   const chapterButtons = [
     "Kinesiologie - 290 întrebări",
     "KDFS - 310 întrebări",
@@ -130,9 +144,40 @@ function selectChapter(chapter) {
     });
 }
 
+function startExam() {
+  examMode = true;
+  chapterName = "Examen Final";
+  document.getElementById('mainTitle').textContent = chapterName;
+
+  Promise.all([
+    fetch(`chapter1.csv?nocache=${Date.now()}`).then(r => r.text()),
+    fetch(`chapter2.csv?nocache=${Date.now()}`).then(r => r.text()),
+    fetch(`chapter3.csv?nocache=${Date.now()}`).then(r => r.text())
+  ]).then(results => {
+    allQuestions[1] = results[0].trim().split('\n').map(parseLine);
+    allQuestions[2] = results[1].trim().split('\n').map(parseLine);
+    allQuestions[3] = results[2].trim().split('\n').map(parseLine);
+
+    const examSet = [];
+    [1, 2, 3].forEach(chap => {
+      const shuffled = allQuestions[chap].sort(() => 0.5 - Math.random());
+      examSet.push(...shuffled.slice(0, 30));
+    });
+
+    questions = examSet;
+    currentQuestion = 0;
+    correctCount = 0;
+    wrongCount = 0;
+    document.getElementById('chapter-selection').style.display = 'none';
+    document.getElementById('quiz').style.display = 'block';
+    showQuestion();
+  });
+}
+
 function showQuestion() {
   if (currentQuestion >= questions.length) {
-    document.getElementById('quiz').innerHTML = `<h2>Test finalizat!</h2><p>Corecte: ${correctCount} | Greșite: ${wrongCount}</p><button onclick="location.reload()">Reîncepe</button><br><br><button style='background:#f44336;' onclick="goBack()">Înapoi la materii</button>`;
+    const finalGrade = Math.round((correctCount / questions.length) * 10 * 100) / 100;
+    document.getElementById('quiz').innerHTML = `<h2>Examen finalizat!</h2><p>Corecte: ${correctCount} | Greșite: ${wrongCount}</p><p>Nota finală: ${finalGrade}</p><button onclick="location.reload()">Reîncepe</button><br><br><button style='background:#f44336;' onclick="goBack()">Înapoi la materii</button>`;
     return;
   }
   document.getElementById('questionCounter').textContent = `${currentQuestion + 1}/${questions.length}`;
