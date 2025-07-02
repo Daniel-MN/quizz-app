@@ -1,8 +1,8 @@
 import random
 
 # Numele fișierului sursă și al celui de ieșire
-input_file = "chapter1.csv"
-output_file = "chapter1_shuffle.csv"
+input_file = "chapter3_unshuffle.csv"
+output_file = "chapter3.csv"
 
 with open(input_file, "r", encoding="utf-8") as fin, open(output_file, "w", encoding="utf-8") as fout:
     for line in fin:
