@@ -164,7 +164,7 @@ function startExam() {
       examSet.push(...shuffled.slice(0, 30));
     });
 
-    questions = examSet;
+    questions = examSet.sort(() => 0.5 - Math.random());
     currentQuestion = 0;
     correctCount = 0;
     wrongCount = 0;
