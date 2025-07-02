@@ -176,9 +176,15 @@ function startExam() {
 
 function showQuestion() {
   if (currentQuestion >= questions.length) {
-    const finalGrade = Math.round((correctCount / questions.length) * 10 * 100) / 100;
-    document.getElementById('quiz').innerHTML = `<h2>Examen finalizat!</h2><p>Corecte: ${correctCount} | Greșite: ${wrongCount}</p><p>Nota finală: ${finalGrade}</p><button onclick="location.reload()">Reîncepe</button><br><br><button style='background:#f44336;' onclick="goBack()">Înapoi la materii</button>`;
-    return;
+    if (!examMode) {
+      const finalGrade = Math.round((correctCount / questions.length) * 10 * 100) / 100;
+      document.getElementById('quiz').innerHTML = `<h2>Examen finalizat!</h2><p>Corecte: ${correctCount} | Greșite: ${wrongCount}</p><p>Nota finală: ${finalGrade}</p><button onclick="location.reload()">Reîncepe</button><br><br><button style='background:#f44336;' onclick="goBack()">Înapoi la materii</button>`;
+      return;
+    } else {
+      const finalGrade = (correctCount + 10) / 10;
+      document.getElementById('quiz').innerHTML = `<h2>Examen finalizat!</h2><p>Corecte: ${correctCount} | Greșite: ${wrongCount}</p><p>Nota finală: ${finalGrade}</p><button onclick="location.reload()">Reîncepe</button><br><br><button style='background:#f44336;' onclick="goBack()">Înapoi la materii</button>`;
+      return;
+    }
   }
   document.getElementById('questionCounter').textContent = `${currentQuestion + 1}/${questions.length}`;
   const q = questions[currentQuestion];
