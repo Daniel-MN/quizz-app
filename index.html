@@ -96,7 +96,7 @@ if (performance.navigation.type === 1) {
       </div>
       <div class="question-counter" id="questionCounter"></div>
       <div>
-        <button id="nextPageBtn" style="display:none; background:#f44336;" onclick="nextPage()">Sari la prima întrebare de pe următoarea pagină</button>
+        <button id="nextPageBtn" style="display:none; background:#f44336;" onclick="nextPage()">Sari la următoarea pagină</button>
       </div>
     </div>
     <h2 id="question"></h2>
@@ -194,7 +194,7 @@ function showQuestion() {
   });
   document.getElementById('feedback').textContent = '';
   document.getElementById('nextBtn').style.display = 'none';
-  document.getElementById('nextPageBtn').style.display = 'none';
+  document.getElementById('nextPageBtn').style.display = examMode ? 'none' : 'inline-block';
   answered = false;
 }
 
@@ -214,7 +214,7 @@ function checkAnswer(selected, btn) {
   document.getElementById('correctCount').textContent = correctCount;
   document.getElementById('wrongCount').textContent = wrongCount;
   document.getElementById('nextBtn').style.display = 'inline-block';
-  document.getElementById('nextPageBtn').style.display = 'inline-block';
+  document.getElementById('nextPageBtn').style.display = examMode ? 'none' : 'inline-block';
 }
 
 function nextQuestion() {
