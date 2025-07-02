@@ -34,7 +34,7 @@
   }
   button {
     padding: 0.7rem 1.5rem;
-    margin: 0.5rem;
+    margin: 0.3rem;
     border: none;
     border-radius: 5px;
     background: #6e8efb;
@@ -61,7 +61,6 @@
   .wrong { background-color: #f44336 !important; }
 </style>
 <script>
-// Force no-cache for index.html reload
 if (performance.navigation.type === 1) {
   const url = new URL(window.location.href);
   url.searchParams.set('nocache', Date.now());
@@ -71,9 +70,9 @@ if (performance.navigation.type === 1) {
 </head>
 <body>
 <div class="container">
-  <h1>Quick Quiz</h1>
+  <h1 id="mainTitle">Examen licență ca la școala de șoferi</h1>
   <div id="chapter-selection">
-    <h2>Select Chapter</h2>
+    <h2>Alege materia</h2>
     <button onclick="selectChapter(1)">Kinesiologie - 290 întrebări</button>
     <button onclick="selectChapter(2)">KDFS - 310 întrebări</button>
     <button onclick="selectChapter(3)">BGK - 150 întrebări</button>
@@ -81,15 +80,19 @@ if (performance.navigation.type === 1) {
   
   <div id="quiz" style="display:none;">
     <div class="question-header">
-      <button style="background:#f44336;" onclick="goBack()">Back to Chapters</button>
+      <div>
+        <button style="background:#f44336;" onclick="goBack()">Înapoi la materii</button>
+      </div>
       <div class="question-counter" id="questionCounter"></div>
-      <button id="nextPageBtn" style="display:none; background:#f44336;" onclick="nextPage()">Next Page</button>
+      <div>
+        <button id="nextPageBtn" style="display:none; background:#f44336;" onclick="nextPage()">Sari la prima întrebare de pe următoarea pagină</button>
+      </div>
     </div>
     <h2 id="question"></h2>
     <div id="answers"></div>
     <p id="feedback"></p>
-    <p>Correct: <span id="correctCount">0</span> | Wrong: <span id="wrongCount">0</span></p>
-    <button id="nextBtn" style="display:none" onclick="nextQuestion()">Next Question</button>
+    <p>Corecte: <span id="correctCount">0</span> | Greșite: <span id="wrongCount">0</span></p>
+    <button id="nextBtn" style="display:none" onclick="nextQuestion()">Următoarea întrebare</button>
   </div>
 </div>
 
@@ -99,12 +102,21 @@ let currentQuestion = 0;
 let correctCount = 0;
 let wrongCount = 0;
 let answered = false;
+let chapterName = "";
 
 function parseLine(line) {
   return line.split(';').map(e => e.trim());
 }
 
 function selectChapter(chapter) {
+  const chapterButtons = [
+    "Kinesiologie - 290 întrebări",
+    "KDFS - 310 întrebări",
+    "BGK - 150 întrebări"
+  ];
+  chapterName = chapterButtons[chapter - 1].split(' -')[0];
+  document.getElementById('mainTitle').textContent = chapterName;
+
   fetch(`chapter${chapter}.csv?nocache=${Date.now()}`)
     .then(response => response.text())
     .then(text => {
@@ -120,7 +132,7 @@ function selectChapter(chapter) {
 
 function showQuestion() {
   if (currentQuestion >= questions.length) {
-    document.getElementById('quiz').innerHTML = `<h2>Quiz Finished!</h2><p>Correct: ${correctCount} | Wrong: ${wrongCount}</p><button onclick="location.reload()">Restart</button><br><br><button style='background:#f44336;' onclick="goBack()">Back to Chapters</button>`;
+    document.getElementById('quiz').innerHTML = `<h2>Test finalizat!</h2><p>Corecte: ${correctCount} | Greșite: ${wrongCount}</p><button onclick="location.reload()">Reîncepe</button><br><br><button style='background:#f44336;' onclick="goBack()">Înapoi la materii</button>`;
     return;
   }
   document.getElementById('questionCounter').textContent = `${currentQuestion + 1}/${questions.length}`;
@@ -147,11 +159,11 @@ function checkAnswer(selected, btn) {
   const correct = questions[currentQuestion][4].trim();
   if (selected === correct) {
     correctCount++;
-    document.getElementById('feedback').textContent = 'Correct!';
+    document.getElementById('feedback').textContent = 'Corect!';
     btn.classList.add('correct');
   } else {
     wrongCount++;
-    document.getElementById('feedback').textContent = `Wrong! Correct answer: ${correct}`;
+    document.getElementById('feedback').textContent = `Greșit! Răspuns corect: ${correct}`;
     btn.classList.add('wrong');
   }
   document.getElementById('correctCount').textContent = correctCount;
@@ -171,6 +183,7 @@ function nextPage() {
 }
 
 function goBack() {
+  document.getElementById('mainTitle').textContent = 'Examen licență ca la școala de șoferi';
   document.getElementById('quiz').style.display = 'none';
   document.getElementById('chapter-selection').style.display = 'block';
 }
